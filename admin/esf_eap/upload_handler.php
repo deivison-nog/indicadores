@@ -207,8 +207,16 @@ for ($i = $headerRow + 1; $i < count($lines); $i++) {
     $categoriaRaw = trim($cols[$headerMap['categoria']] ?? '');
     $categoriaKey = mb_strtolower($categoriaRaw, 'UTF-8');
 
-    // Normalise accented chars for comparison
-    $categoriaNorm = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $categoriaKey);
+    // Normalise accented chars for comparison (portable replacement map)
+    $accentMap = [
+        'é' => 'e', 'ê' => 'e', 'è' => 'e', 'ẽ' => 'e',
+        'á' => 'a', 'â' => 'a', 'à' => 'a', 'ã' => 'a',
+        'í' => 'i', 'î' => 'i', 'ì' => 'i',
+        'ó' => 'o', 'ô' => 'o', 'ò' => 'o', 'õ' => 'o',
+        'ú' => 'u', 'û' => 'u', 'ù' => 'u',
+        'ç' => 'c', 'ñ' => 'n',
+    ];
+    $categoriaNorm = strtr($categoriaKey, $accentMap);
     if (!str_contains($categoriaNorm, 'medico') && !str_contains($categoriaNorm, 'enfermeiro')) {
         // Could be a summary row or unsupported category
         $skippedRows++;

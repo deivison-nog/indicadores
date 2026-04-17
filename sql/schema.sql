@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS mais_acesso_data (
 );
 
 -- seed: default admin account (password: admin123)
+-- !! IMPORTANT: Change this password immediately after first login in production !!
 INSERT IGNORE INTO administrators (name, email, password_hash, public_token)
 VALUES (
     'Administrador',

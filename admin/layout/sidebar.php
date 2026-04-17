@@ -128,13 +128,13 @@ $currentPage = $currentPage ?? '';
 
 <!-- Sidebar overlay for mobile -->
 <div class="d-md-none" id="sidebarOverlay"
-     style="display:none!important;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1029;"
+     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1029;"
      onclick="closeSidebar()"></div>
 
 <script>
 function closeSidebar() {
     document.getElementById('sidebar').classList.remove('show');
-    document.getElementById('sidebarOverlay').style.display = 'none !important';
+    document.getElementById('sidebarOverlay').style.display = 'none';
 }
 document.getElementById('sidebarToggle').addEventListener('click', function () {
     const sb = document.getElementById('sidebar');

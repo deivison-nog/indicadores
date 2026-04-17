@@ -1,7 +1,7 @@
 <?php
-require_once dirname(__DIR__) . '/../config/config.php';
-require_once dirname(__DIR__) . '/../config/database.php';
-require_once dirname(__DIR__) . '/../auth/check_auth.php';
+require_once dirname(__DIR__) . '/config/config.php';
+require_once dirname(__DIR__) . '/config/database.php';
+require_once dirname(__DIR__) . '/auth/check_auth.php';
 
 // Admin only
 if ($currentUser['type'] !== 'admin') {

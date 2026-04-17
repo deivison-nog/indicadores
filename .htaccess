@@ -2,10 +2,11 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Block direct access to config, auth, sql directories
-    RewriteRule ^config/.*$  - [F,L]
-    RewriteRule ^auth/.*$    - [F,L]
-    RewriteRule ^sql/.*$     - [F,L]
+    # Block direct access to config, auth (except login_handler), sql directories
+    RewriteRule ^config/.*$              - [F,L]
+    RewriteRule ^auth/login_handler\.php$ - [L]
+    RewriteRule ^auth/.*$                - [F,L]
+    RewriteRule ^sql/.*$                 - [F,L]
 </IfModule>
 
 # Disable directory listing

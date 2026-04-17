@@ -15,10 +15,12 @@ if (getenv('APP_URL') !== false && getenv('APP_URL') !== '') {
     define('BASE_URL', rtrim(getenv('APP_URL'), '/') . '/');
 } else {
     // __DIR__ is <docroot>/indicadores/config  → two levels up gives docroot.
-    $docRoot  = rtrim($_SERVER['DOCUMENT_ROOT'] ?? '', '/\\');
-    $basePath = rtrim(dirname(__DIR__), '/\\');
+    // Normalise both paths to forward slashes first so str_replace works on
+    // Windows (XAMPP), where dirname() returns backslashes but DOCUMENT_ROOT
+    // uses forward slashes.
+    $docRoot  = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? ''), '/');
+    $basePath = rtrim(str_replace('\\', '/', dirname(__DIR__)), '/');
     $subDir   = str_replace($docRoot, '', $basePath);
-    $subDir   = str_replace('\\', '/', $subDir); // normalise Windows paths
     define('BASE_URL', rtrim($subDir, '/') . '/');
 }
 

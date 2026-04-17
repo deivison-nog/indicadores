@@ -114,7 +114,7 @@ $colAliases = [
     'consulta_agendada'            => ['consulta agendada'],
     'consulta_agendada_programada' => ['consulta agendada programada', 'consulta agendada programada / cuidado continuado', 'cuidado continuado'],
     'consulta_no_dia'              => ['consulta no dia'],
-    'total'                        => ['total'],
+    'total'                        => ['totais', 'total'],
 ];
 
 foreach ($lines as $lineIdx => $line) {
@@ -162,8 +162,8 @@ if ($headerRow === -1) {
     );
 }
 
-// Verify required columns
-$requiredFields = ['equipe', 'categoria', 'total'];
+// Verify required columns (total/totais is optional — computed from row values if absent)
+$requiredFields = ['equipe', 'categoria'];
 foreach ($requiredFields as $f) {
     if (!isset($headerMap[$f])) {
         flashAndRedirect(
@@ -238,7 +238,9 @@ for ($i = $headerRow + 1; $i < count($lines); $i++) {
         'consulta_agendada'            => $getInt('consulta_agendada'),
         'consulta_agendada_programada' => $getInt('consulta_agendada_programada'),
         'consulta_no_dia'              => $getInt('consulta_no_dia'),
-        'total'                        => $getInt('total'),
+        'total'                        => isset($headerMap['total'])
+            ? $getInt('total')
+            : ($getInt('atendimento_urgencia') + $getInt('consulta_agendada') + $getInt('consulta_agendada_programada') + $getInt('consulta_no_dia')),
     ];
 }
 

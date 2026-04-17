@@ -11,6 +11,7 @@ $admin    = null;
 $tableData = [];
 $imports   = [];
 $chartColors = [];
+$pieCounts   = ['otimo' => 0, 'bom' => 0, 'suficiente' => 0, 'regular' => 0];
 
 if ($token === '') {
     http_response_code(400);
@@ -75,13 +76,13 @@ if ($token === '') {
                         'score_fmt' => number_format($score, 2, ',', '.'),
                     ];
                     if ($score > 50 && $score <= 70) {
-                        $chartColors[] = 'rgba(25,135,84,0.8)';   // Ótimo
+                        $pieCounts['otimo']++;
                     } elseif ($score > 30 && $score <= 50) {
-                        $chartColors[] = 'rgba(13,110,253,0.8)';  // Bom
+                        $pieCounts['bom']++;
                     } elseif ($score > 10 && $score <= 30) {
-                        $chartColors[] = 'rgba(253,126,20,0.8)';  // Suficiente
+                        $pieCounts['suficiente']++;
                     } else {
-                        $chartColors[] = 'rgba(220,53,69,0.8)';   // Regular (≤10 ou >70)
+                        $pieCounts['regular']++;
                     }
                 }
                 usort($tableData, fn($a, $b) => $b['score'] <=> $a['score']);
@@ -164,7 +165,7 @@ if ($token === '') {
     <!-- Chart -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-header bg-white border-bottom fw-semibold">
-            <i class="bi bi-bar-chart-fill me-2 text-success"></i>
+            <i class="bi bi-pie-chart-fill me-2 text-success"></i>
             Pontuação por Equipe — <?= htmlspecialchars($selectedComp) ?>
         </div>
         <div class="card-body">
@@ -203,7 +204,7 @@ if ($token === '') {
                             else                         $bc = 'bg-danger';
                             ?>
                             <span class="badge <?= $bc ?> px-3 py-2" style="font-size:.85rem;">
-                                <?= $row['score_fmt'] ?>%
+                                <?= $row['score_fmt'] ?>
                             </span>
                         </td>
                     </tr>
@@ -244,38 +245,40 @@ if ($token === '') {
 <?php if (!empty($tableData)): ?>
 <script>
 (function () {
-    const labels = <?= json_encode(array_column($tableData, 'equipe')) ?>;
-    const scores = <?= json_encode(array_column($tableData, 'score')) ?>;
-    const colors = <?= json_encode($chartColors) ?>;
+    const pieLabels = ['Ótimo', 'Bom', 'Suficiente', 'Regular'];
+    const pieData   = <?= json_encode(array_values($pieCounts)) ?>;
+    const pieColors = [
+        'rgba(25,135,84,0.85)',
+        'rgba(13,110,253,0.85)',
+        'rgba(253,126,20,0.85)',
+        'rgba(220,53,69,0.85)'
+    ];
 
     new Chart(document.getElementById('scoreChart').getContext('2d'), {
-        type: 'bar',
+        type: 'doughnut',
         data: {
-            labels,
+            labels: pieLabels,
             datasets: [{
-                label: 'Pontuação (%)',
-                data: scores,
-                backgroundColor: colors,
-                borderColor: colors.map(c => c.replace('0.8', '1')),
-                borderWidth: 1,
-                borderRadius: 4,
+                data: pieData,
+                backgroundColor: pieColors,
+                borderColor: pieColors.map(c => c.replace('0.85', '1')),
+                borderWidth: 2,
+                hoverOffset: 10
             }]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: { label: ctx => ctx.parsed.y.toFixed(2).replace('.', ',') + '%' }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true, max: 100,
-                    ticks: { callback: v => v + '%' },
-                    grid: { color: 'rgba(0,0,0,.06)' }
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: { padding: 16, font: { size: 13 } }
                 },
-                x: { ticks: { maxRotation: 35, font: { size: 11 } } }
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + ' equipe(s)'
+                    }
+                }
             }
         }
     });

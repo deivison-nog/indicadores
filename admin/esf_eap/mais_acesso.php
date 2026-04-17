@@ -21,9 +21,8 @@ $adminId       = $currentUser['admin_id'];
 $selectedComp  = trim($_GET['competency'] ?? '');
 $imports       = [];
 $tableData     = [];
-$chartLabels   = [];
-$chartScores   = [];
 $chartColors   = [];
+$pieCounts     = ['otimo' => 0, 'bom' => 0, 'suficiente' => 0, 'regular' => 0];
 
 try {
     $pdo = Database::getInstance();
@@ -78,17 +77,15 @@ try {
                 'score'     => $score,
                 'score_fmt' => number_format($score, 2, ',', '.'),
             ];
-            $chartLabels[] = $equipe;
-            $chartScores[] = round($score, 2);
             // Color logic: Ótimo >50≤70, Bom >30≤50, Suficiente >10≤30, Regular ≤10 ou >70
             if ($score > 50 && $score <= 70) {
-                $chartColors[] = 'rgba(25,135,84,0.8)';   // Ótimo
+                $pieCounts['otimo']++;
             } elseif ($score > 30 && $score <= 50) {
-                $chartColors[] = 'rgba(13,110,253,0.8)';  // Bom
+                $pieCounts['bom']++;
             } elseif ($score > 10 && $score <= 30) {
-                $chartColors[] = 'rgba(253,126,20,0.8)';  // Suficiente
+                $pieCounts['suficiente']++;
             } else {
-                $chartColors[] = 'rgba(220,53,69,0.8)';   // Regular (≤10 ou >70)
+                $pieCounts['regular']++;
             }
         }
 
@@ -237,7 +234,7 @@ require_once __DIR__ . '/../layout/sidebar.php';
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between">
                 <span class="fw-semibold">
-                    <i class="bi bi-bar-chart-fill me-2 text-success"></i>
+                    <i class="bi bi-pie-chart-fill me-2 text-success"></i>
                     Pontuação por Equipe — <?= htmlspecialchars($selectedComp) ?>
                 </span>
                 <span class="badge bg-success-subtle text-success border border-success-subtle">
@@ -296,7 +293,7 @@ require_once __DIR__ . '/../layout/sidebar.php';
                                     }
                                     ?>
                                     <span class="badge <?= $badgeClass ?> px-3 py-2" style="font-size:.85rem;">
-                                        <?= $row['score_fmt'] ?>%
+                                        <?= $row['score_fmt'] ?>
                                     </span>
                                 </td>
                             </tr>
@@ -334,48 +331,38 @@ require_once __DIR__ . '/../layout/sidebar.php';
 <?php if (!empty($tableData)): ?>
 <script>
 (function () {
-    const labels = <?= json_encode(array_column($tableData, 'equipe')) ?>;
-    const scores = <?= json_encode(array_column($tableData, 'score')) ?>;
-    const colors = <?= json_encode($chartColors) ?>;
+    const pieLabels = ['Ótimo', 'Bom', 'Suficiente', 'Regular'];
+    const pieData   = <?= json_encode(array_values($pieCounts)) ?>;
+    const pieColors = [
+        'rgba(25,135,84,0.85)',
+        'rgba(13,110,253,0.85)',
+        'rgba(253,126,20,0.85)',
+        'rgba(220,53,69,0.85)'
+    ];
 
-    // Re-sort for chart (already sorted by score desc in PHP)
-    const ctx = document.getElementById('scoreChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
+    new Chart(document.getElementById('scoreChart').getContext('2d'), {
+        type: 'doughnut',
         data: {
-            labels: labels,
+            labels: pieLabels,
             datasets: [{
-                label: 'Pontuação (%)',
-                data: scores,
-                backgroundColor: colors,
-                borderColor: colors.map(c => c.replace('0.8', '1')),
-                borderWidth: 1,
-                borderRadius: 4,
+                data: pieData,
+                backgroundColor: pieColors,
+                borderColor: pieColors.map(c => c.replace('0.85', '1')),
+                borderWidth: 2,
+                hoverOffset: 10
             }]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: { display: false },
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: { padding: 16, font: { size: 13 } }
+                },
                 tooltip: {
                     callbacks: {
-                        label: ctx => ctx.parsed.y.toFixed(2).replace('.', ',') + '%'
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    ticks: {
-                        callback: v => v + '%'
-                    },
-                    grid: { color: 'rgba(0,0,0,.06)' }
-                },
-                x: {
-                    ticks: {
-                        maxRotation: 35,
-                        font: { size: 11 }
+                        label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + ' equipe(s)'
                     }
                 }
             }

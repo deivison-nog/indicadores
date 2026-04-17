@@ -124,7 +124,9 @@ $separator = ';'; // fallback
 //   row A  ;;Tipo de Atendimento;Atendimento de Urgência;Consulta Agendada;…
 //   row B  Equipe;Categoria Profissional;;
 // We need to merge both rows to map all fields correctly.
-$prevLineIdx = -1; // index of the previous non-empty line
+// $prevLineIdx tracks the last non-empty, non-header line seen before the
+// "Equipe / Categoria Profissional" row (row B above), which is row A.
+$prevLineIdx = -1;
 
 foreach ($lines as $lineIdx => $line) {
     if (trim($line) === '') {
@@ -144,10 +146,10 @@ foreach ($lines as $lineIdx => $line) {
 
     $headerRow = $lineIdx;
 
-    // If the previous non-empty row exists, merge its non-empty cells into
-    // $colsNorm at the same column index.  This covers the common e-SUS layout
-    // where numeric sub-column labels live on the row immediately above the
-    // "Equipe / Categoria Profissional" row.
+    // If the previous non-empty, non-header row exists, merge its non-empty
+    // cells into $colsNorm at the same column index.  This covers the common
+    // e-SUS APS layout where numeric sub-column labels (row A) live on the row
+    // immediately above the "Equipe / Categoria Profissional" row (row B).
     if ($prevLineIdx !== -1) {
         $prevCols     = str_getcsv($lines[$prevLineIdx], $separator);
         $prevColsNorm = array_map(fn($c) => mb_strtolower(trim($c)), $prevCols);

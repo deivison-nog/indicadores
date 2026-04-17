@@ -19,3 +19,8 @@ error_log
 # Composer (if added later)
 vendor/
 composer.lock
+
+# Node dependencies (used for local dev tooling only)
+node_modules/
+package.json
+package-lock.json

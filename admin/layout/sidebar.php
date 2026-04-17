@@ -78,12 +78,12 @@ $currentPage = $currentPage ?? '';
     <div class="collapse sub-nav" id="menu-esb">
         <?php
         $esbItems = [
-            'Primeira Consulta Odontológica',
+            'Consulta Odontológica Programada na APS',
             'Tratamento Odontológico Concluído',
-            'Escovação Dental Supervisionada',
-            'Fluoretação das Águas',
-            'Exodontia',
-            'Urgência Odontológica',
+            'Taxa de Exodontias na APS',
+            'Escovação Supervisionada na APS',
+            'Procedimentos Odontológicos Preventivos na APS',
+            'Tratamento Restaurador Atraumático na APS',
         ];
         foreach ($esbItems as $item): ?>
             <span class="nav-link disabled" title="Em breve">
@@ -107,12 +107,12 @@ $currentPage = $currentPage ?? '';
     <div class="collapse sub-nav" id="menu-emulti">
         <span class="nav-link disabled" title="Em breve">
             <i class="bi bi-dash"></i>
-            Indicador eMulti 1
+            Média de Atendimentos da eMulti por Pessoa
             <span class="badge bg-secondary ms-auto" style="font-size:.65rem;">Em breve</span>
         </span>
         <span class="nav-link disabled" title="Em breve">
             <i class="bi bi-dash"></i>
-            Indicador eMulti 2
+            Ações Interprofissionais da eMulti na APS
             <span class="badge bg-secondary ms-auto" style="font-size:.65rem;">Em breve</span>
         </span>
     </div>

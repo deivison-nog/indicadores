@@ -61,6 +61,6 @@ INSERT IGNORE INTO administrators (name, email, password_hash, public_token)
 VALUES (
     'Administrador',
     'admin@indicadores.local',
-    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+    '$2y$10$CJcHyjcz8MbSdokdOt8tNOv32O5nfu2YWQjoyqIyLtKeXiSXwD.Pa',
     'default_token_abc123def456'
 );

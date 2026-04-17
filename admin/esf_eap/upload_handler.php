@@ -263,7 +263,17 @@ try {
     $existing = $stmt->fetchColumn();
 
     if ($existing) {
-        // Overwrite: delete existing data then re-import
+        // Warn user unless they already confirmed overwrite
+        $confirmOverwrite = trim($_POST['confirm_overwrite'] ?? '');
+        if ($confirmOverwrite !== '1') {
+            $_SESSION['flash_message'] = "Já existe uma importação para a competência <strong>{$competency}</strong>. Para substituir os dados, envie o arquivo novamente e confirme abaixo.";
+            $_SESSION['flash_type']    = 'warning';
+            $_SESSION['overwrite_competency'] = $competency;
+            header('Location: ' . $redirectTo);
+            exit;
+        }
+
+        // Overwrite confirmed: delete existing data then re-import
         $pdo->beginTransaction();
 
         $stmt = $pdo->prepare('DELETE FROM mais_acesso_data WHERE import_id = ?');

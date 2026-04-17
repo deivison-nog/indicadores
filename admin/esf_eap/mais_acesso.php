@@ -13,6 +13,10 @@ $flashMessage = $_SESSION['flash_message'] ?? '';
 $flashType    = $_SESSION['flash_type']    ?? 'info';
 unset($_SESSION['flash_message'], $_SESSION['flash_type']);
 
+// Overwrite warning: remember which competency is pending confirmation
+$overwriteComp = $_SESSION['overwrite_competency'] ?? '';
+unset($_SESSION['overwrite_competency']);
+
 $adminId       = $currentUser['admin_id'];
 $selectedComp  = trim($_GET['competency'] ?? '');
 $imports       = [];
@@ -153,6 +157,7 @@ require_once __DIR__ . '/../layout/sidebar.php';
                             placeholder="MM/AAAA"
                             pattern="^\d{2}/\d{4}$"
                             maxlength="7"
+                            value="<?= htmlspecialchars($overwriteComp) ?>"
                             required
                         >
                         <div class="form-text">Formato: 01/2024</div>
@@ -169,6 +174,17 @@ require_once __DIR__ . '/../layout/sidebar.php';
                             required
                         >
                     </div>
+
+                    <?php if ($overwriteComp !== ''): ?>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="confirmOverwrite"
+                               name="confirm_overwrite" value="1" required>
+                        <label class="form-check-label text-warning fw-semibold small" for="confirmOverwrite">
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+                            Confirmo que desejo substituir os dados da competência <strong><?= htmlspecialchars($overwriteComp) ?></strong>
+                        </label>
+                    </div>
+                    <?php endif; ?>
 
                     <div class="d-grid">
                         <button type="submit" class="btn btn-success" id="submitBtn">

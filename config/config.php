@@ -6,7 +6,7 @@
 define('DB_HOST',     'localhost');
 define('DB_NAME',     'indicadores');
 define('DB_USER',     'root');
-define('DB_PASS',     '');
+define('DB_PASS',     getenv('DB_PASS') ?: 'root');
 define('DB_CHARSET',  'utf8mb4');
 define('BASE_PATH',   dirname(__DIR__));
 define('BASE_URL',    '/');

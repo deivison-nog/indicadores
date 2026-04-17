@@ -7,9 +7,22 @@ define('DB_USER',     getenv('DB_USER')    ?: 'root');
 define('DB_PASS',     getenv('DB_PASS')    ?: '');
 define('DB_CHARSET',  'utf8mb4');
 define('BASE_PATH',   dirname(__DIR__));
-define('BASE_URL',    '/');
-// Set APP_URL env var in production to e.g. https://indicadores.exemplo.gov.br
-define('APP_URL',     getenv('APP_URL')    ?: '');
+
+// Detect the subfolder path automatically so the app works whether installed
+// at the web-root (/) or inside a subfolder (e.g. /indicadores/).
+// Override with the APP_URL env var in production (e.g. https://domain.com/indicadores/).
+if (getenv('APP_URL') !== false && getenv('APP_URL') !== '') {
+    define('BASE_URL', rtrim(getenv('APP_URL'), '/') . '/');
+} else {
+    // __DIR__ is <docroot>/indicadores/config  → two levels up gives docroot.
+    $docRoot  = rtrim($_SERVER['DOCUMENT_ROOT'] ?? '', '/\\');
+    $basePath = rtrim(dirname(__DIR__), '/\\');
+    $subDir   = str_replace($docRoot, '', $basePath);
+    $subDir   = str_replace('\\', '/', $subDir); // normalise Windows paths
+    define('BASE_URL', rtrim($subDir, '/') . '/');
+}
+
+define('APP_URL', BASE_URL); // kept for backward-compat
 define('UPLOADS_PATH', BASE_PATH . '/uploads');
 define('APP_NAME',    'Indicadores APS');
 

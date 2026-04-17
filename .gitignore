@@ -1,0 +1,21 @@
+# Uploaded CSV files (keep directory structure)
+uploads/**/*.csv
+uploads/**/*.CSV
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# PHP logs
+*.log
+error_log
+
+# Composer (if added later)
+vendor/
+composer.lock

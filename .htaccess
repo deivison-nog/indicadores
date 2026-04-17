@@ -1,0 +1,18 @@
+# Deny direct access to sensitive directories
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Block direct access to config, auth, sql directories
+    RewriteRule ^config/.*$  - [F,L]
+    RewriteRule ^auth/.*$    - [F,L]
+    RewriteRule ^sql/.*$     - [F,L]
+</IfModule>
+
+# Disable directory listing
+Options -Indexes
+
+# Protect .env-like files
+<FilesMatch "\.(htaccess|htpasswd|env|log|sh|sql)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

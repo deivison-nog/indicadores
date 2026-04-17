@@ -11,8 +11,7 @@
 # Disable directory listing
 Options -Indexes
 
-# Protect .env-like files
+# Protect .env-like files (Apache 2.4+ syntax)
 <FilesMatch "\.(htaccess|htpasswd|env|log|sh|sql)$">
-    Order Allow,Deny
-    Deny from all
+    Require all denied
 </FilesMatch>

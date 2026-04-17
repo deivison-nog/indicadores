@@ -97,7 +97,7 @@ unset($_SESSION['flash_message'], $_SESSION['flash_type']);
             </div>
         <?php endif; ?>
 
-        <form action="<?= BASE_URL ?>auth/login_handler.php" method="POST" novalidate>
+        <form action="<?= BASE_URL ?>auth/login_handler.php" method="POST">
             <div class="mb-3">
                 <label for="email" class="form-label fw-semibold">E-mail</label>
                 <div class="input-group">

@@ -49,9 +49,8 @@ try {
     $lastImport        = null;
 }
 
-$publicUrl  = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
-            . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')
-            . BASE_URL . 'user/view.php?token=' . urlencode($admin['public_token'] ?? '');
+// Build public URL using APP_URL (configure APP_URL env var for production)
+$publicUrl = rtrim(APP_URL, '/') . '/user/view.php?token=' . urlencode($admin['public_token'] ?? '');
 
 $pageTitle   = 'Dashboard';
 $currentPage = 'dashboard';

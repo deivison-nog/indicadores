@@ -63,8 +63,8 @@ if ($_FILES['csv_file']['size'] > 10 * 1024 * 1024) {
 
 // ── 3. Ensure uploads directory exists ──
 $uploadsDir = UPLOADS_PATH . '/esf_eap';
-if (!is_dir($uploadsDir)) {
-    mkdir($uploadsDir, 0755, true);
+if (!is_dir($uploadsDir) && !mkdir($uploadsDir, 0755, true)) {
+    flashAndRedirect('Não foi possível criar o diretório de uploads. Verifique as permissões.', 'danger', $redirectTo);
 }
 
 // ── 4. Build destination filename ──
@@ -266,7 +266,7 @@ try {
         // Warn user unless they already confirmed overwrite
         $confirmOverwrite = trim($_POST['confirm_overwrite'] ?? '');
         if ($confirmOverwrite !== '1') {
-            $_SESSION['flash_message'] = "Já existe uma importação para a competência <strong>{$competency}</strong>. Para substituir os dados, envie o arquivo novamente e confirme abaixo.";
+            $_SESSION['flash_message'] = 'Já existe uma importação para a competência ' . htmlspecialchars($competency) . '. Para substituir os dados, envie o arquivo novamente e confirme abaixo.';
             $_SESSION['flash_type']    = 'warning';
             $_SESSION['overwrite_competency'] = $competency;
             header('Location: ' . $redirectTo);

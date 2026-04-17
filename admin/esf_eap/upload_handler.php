@@ -120,6 +120,12 @@ $headerMap = [];
 // and 'categoria') rather than from $lines[0] which may be a metadata row.
 $separator = ';'; // fallback
 
+// e-SUS APS exports use a two-row header:
+//   row A  ;;Tipo de Atendimento;Atendimento de Urgência;Consulta Agendada;…
+//   row B  Equipe;Categoria Profissional;;
+// We need to merge both rows to map all fields correctly.
+$prevLineIdx = -1; // index of the previous non-empty line
+
 foreach ($lines as $lineIdx => $line) {
     if (trim($line) === '') {
         continue;
@@ -127,15 +133,30 @@ foreach ($lines as $lineIdx => $line) {
 
     $lineLower = mb_strtolower($line);
     if (!str_contains($lineLower, 'equipe') || !str_contains($lineLower, 'categoria')) {
+        $prevLineIdx = $lineIdx;
         continue;
     }
 
-    // This line is the header — use it for separator detection and column mapping.
+    // This line is the "equipe+categoria" header row — use it for separator detection.
     $separator = detectSeparator($line);
     $cols      = str_getcsv($line, $separator);
     $colsNorm  = array_map(fn($c) => mb_strtolower(trim($c)), $cols);
 
     $headerRow = $lineIdx;
+
+    // If the previous non-empty row exists, merge its non-empty cells into
+    // $colsNorm at the same column index.  This covers the common e-SUS layout
+    // where numeric sub-column labels live on the row immediately above the
+    // "Equipe / Categoria Profissional" row.
+    if ($prevLineIdx !== -1) {
+        $prevCols     = str_getcsv($lines[$prevLineIdx], $separator);
+        $prevColsNorm = array_map(fn($c) => mb_strtolower(trim($c)), $prevCols);
+        foreach ($prevColsNorm as $idx => $prevCell) {
+            if ($prevCell !== '' && ($colsNorm[$idx] ?? '') === '') {
+                $colsNorm[$idx] = $prevCell;
+            }
+        }
+    }
 
     // Map field → column index.
     // $usedCols prevents two fields from claiming the same column index, which

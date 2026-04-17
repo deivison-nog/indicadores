@@ -1,0 +1,40 @@
+﻿e-SUS - APS
+MINISTÉRIO DA SAÚDE
+ESTADO DE PARÁ
+MUNICÍPIO DE COLARES
+
+Relatório gerencial de atendimentos
+
+FILTROS
+Período:;01/03/2026 a 31/03/2026;
+Atendimento compartilhado:;"Não";"Sim";
+Categoria profissional:;"Enfermeiro";"Médico";
+CBO:;"Assistente social - 251605";"Auxiliar em saúde bucal da estratégia de saúde da família - 322430";"Cirurgião-dentista da estratégia de saúde da família - 223293";"Enfermeiro da estratégia de saúde da família - 223565";"Fisioterapeuta geral - 223605";"Fonoaudiólogo geral - 223810";"Médico da estratégia de saúde da família - 225142";"Nutricionista - 223710";"Psicólogo clínico - 251510";"Terapeuta ocupacional - 223905";
+Dia:;"02/03/2026";"03/03/2026";"04/03/2026";"05/03/2026";"06/03/2026";"09/03/2026";"10/03/2026";"11/03/2026";"12/03/2026";"13/03/2026";"16/03/2026";"17/03/2026";"18/03/2026";"19/03/2026";"20/03/2026";"23/03/2026";"24/03/2026";"25/03/2026";"26/03/2026";"27/03/2026";"30/03/2026";"31/03/2026";
+Dia da semana:;"Segunda-feira";"Terça-feira";"Quarta-feira";"Quinta-feira";"Sexta-feira";
+Equipe:;"Cristal (Mocajatuba)";"Emulti Complementar";"Equipe da Orla";"Equipe de Jangolandia";"Equipe de Jenipauba da Laura";"Equipe de Maracajo";"Equipe de Mocajatuba";"Jangolandia";"Morada do Sol (J-laura)";"Orla";"Riacho Doce (Maracajo)";"Sem Equipe";
+Faixa etária:;"Menos de 01 ano";"01 ano";"02 anos";"03 anos";"04 anos";"05 a 09 anos";"10 a 14 anos";"15 a 19 anos";"20 a 24 anos";"25 a 29 anos";"30 a 34 anos";"35 a 39 anos";"40 a 44 anos";"45 a 49 anos";"50 a 54 anos";"55 a 59 anos";"60 a 64 anos";"65 a 69 anos";"70 a 74 anos";"75 a 79 anos";"80 anos ou mais";
+Hora:;"07:00 até 07:59";"08:00 até 08:59";"09:00 até 09:59";"10:00 até 10:59";"11:00 até 11:59";"12:00 até 12:59";"13:00 até 13:59";"14:00 até 14:59";"15:00 até 15:59";"16:00 até 16:59";"17:00 até 17:59";"19:00 até 19:59";"Não informado";
+Mês:;"Março";
+Profissional:;"Analice de Cassia da Silva Vieira";"Andreza Magalhaes dos Santos";"Bruce Barros Alves";"Bruna Mayara Lima Pupio Menezes";"Bruno Dias Borges";"Davi Gabriel Barbosa";"Elaine Cristine da Silva Goncalves";"Erica Macedo Martins";"Fernando Wellyngton Santana Pereira";"Livia de Oliveira Bahia";"Maiza Galego Correa";"Marilia Pereira e Pereira";"Marilia do Rosario de Mendonca Rui Seco";"Messiria das Gracas Soares Ferreira";"Nelia Marise Xavier Margalho";"Nesvaldo Soares da Silva";"Otacilio Tavares da Silva Netto";"Raimunda de Jesus Soares de Oliveira";"Ruth Taina Palheta de Almeida";"Stefanie Soraia Araujo dos Santos";"Talita Teles do Nascimento";"Ueliton Teixeira Miranda";"Viviane Palheta Rodrigues";"Yuleisy Cardona Feria";
+Sexo:;"Feminino";"Masculino";
+Tipo de atendimento:;"Atendimento de Urgência";"Consulta Agendada";"Consulta Agendada Programada / Cuidado Continuado";"Consulta no Dia";
+Tipo de consulta:;"Atendimento Individual";"Atendimento Odontológico";
+Turno:;"Manhã";"Tarde";"Noite";
+Unidade de saúde:;"Unidade de Saude da Familia da Orla";"Unidade de Saude da Familia de Jangolandia";"Unidade de Saude da Familia de Jenipauba da Laura";"Unidade de Saude da Familia de Maracajo";"Unidade de Saude da Familia de Mocajatuba";
+
+Forma de apresentação:;Contagem
+Gerado em 17/04/2026 às 00:17 por DEIVISON SARAIVA NOGUEIRA
+
+;;Tipo de Atendimento;Atendimento de Urgência;Consulta Agendada;Consulta Agendada Programada / Cuidado Continuado;Consulta no Dia;Totais;
+Equipe;Categoria Profissional;;
+Cristal (Mocajatuba);Enfermeiro;;1;19;44;15;79;
+Cristal (Mocajatuba);Médico;;;111;2;21;134;
+Jangolandia;Enfermeiro;;11;9;;52;72;
+Jangolandia;Médico;;;84;;111;195;
+Morada do Sol (J-laura);Enfermeiro;;1;91;29;59;180;
+Morada do Sol (J-laura);Médico;;2;171;47;89;309;
+Orla;Enfermeiro;;4;14;9;11;38;
+Orla;Médico;;;34;8;38;80;
+Riacho Doce (Maracajo);Enfermeiro;;7;2;66;68;143;
+Totais;;;26;535;205;464;1230;

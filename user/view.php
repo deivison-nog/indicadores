@@ -74,12 +74,14 @@ if ($token === '') {
                         'score'     => $score,
                         'score_fmt' => number_format($score, 2, ',', '.'),
                     ];
-                    if ($score >= 75) {
-                        $chartColors[] = 'rgba(25,135,84,0.8)';
-                    } elseif ($score >= 50) {
-                        $chartColors[] = 'rgba(255,193,7,0.8)';
+                    if ($score > 50 && $score <= 70) {
+                        $chartColors[] = 'rgba(25,135,84,0.8)';   // Ótimo
+                    } elseif ($score > 30 && $score <= 50) {
+                        $chartColors[] = 'rgba(13,110,253,0.8)';  // Bom
+                    } elseif ($score > 10 && $score <= 30) {
+                        $chartColors[] = 'rgba(253,126,20,0.8)';  // Suficiente
                     } else {
-                        $chartColors[] = 'rgba(220,53,69,0.8)';
+                        $chartColors[] = 'rgba(220,53,69,0.8)';   // Regular (≤10 ou >70)
                     }
                 }
                 usort($tableData, fn($a, $b) => $b['score'] <=> $a['score']);
@@ -195,9 +197,10 @@ if ($token === '') {
                         <td class="text-center">
                             <?php
                             $s = $row['score'];
-                            if ($s >= 75)      $bc = 'bg-success';
-                            elseif ($s >= 50)  $bc = 'bg-warning text-dark';
-                            else               $bc = 'bg-danger';
+                            if ($s > 50 && $s <= 70)     $bc = 'bg-success';
+                            elseif ($s > 30 && $s <= 50) $bc = 'bg-primary';
+                            elseif ($s > 10 && $s <= 30) $bc = 'bg-warning text-dark';
+                            else                         $bc = 'bg-danger';
                             ?>
                             <span class="badge <?= $bc ?> px-3 py-2" style="font-size:.85rem;">
                                 <?= $row['score_fmt'] ?>%
@@ -210,9 +213,10 @@ if ($token === '') {
         </div>
         <div class="card-footer bg-white border-top small text-muted">
             Pontuação = (NM ÷ DN) × 100 &nbsp;|&nbsp;
-            <span class="badge bg-success">≥ 75%</span> Meta atingida &nbsp;
-            <span class="badge bg-warning text-dark">≥ 50%</span> Parcial &nbsp;
-            <span class="badge bg-danger">< 50%</span> Abaixo da meta
+            <span class="badge bg-success">Ótimo: &gt;50 e ≤70%</span>&nbsp;
+            <span class="badge bg-primary">Bom: &gt;30 e ≤50%</span>&nbsp;
+            <span class="badge bg-warning text-dark">Suficiente: &gt;10 e ≤30%</span>&nbsp;
+            <span class="badge bg-danger">Regular: ≤10 ou &gt;70%</span>
         </div>
     </div>
 

@@ -187,6 +187,7 @@ if ($token === '') {
                         <th class="text-center">DN</th>
                         <th class="text-center">NM</th>
                         <th class="text-center">Pontuação</th>
+                        <th class="text-center">Dica</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -206,6 +207,33 @@ if ($token === '') {
                             <span class="badge <?= $bc ?> px-3 py-2" style="font-size:.85rem;">
                                 <?= $row['score_fmt'] ?>
                             </span>
+                        </td>
+                        <td class="text-center">
+                            <?php
+                            if ($s > 50 && $s <= 70) {
+                                $tip = 'Ótimo desempenho! A equipe mantém equilíbrio ideal entre demanda programada (>50% e ≤70%) e espontânea. Continue monitorando mensalmente para sustentar esse resultado.';
+                                $tipIcon = 'bi-check-circle-fill text-success';
+                            } elseif ($s > 30 && $s <= 50) {
+                                $tip = 'Bom desempenho. Para alcançar o Ótimo, amplie gradativamente as consultas agendadas, agendadas programadas e de cuidado continuado até atingir entre 50% e 70% do total de atendimentos.';
+                                $tipIcon = 'bi-lightbulb-fill text-primary';
+                            } elseif ($s > 10 && $s <= 30) {
+                                $tip = 'A equipe ainda concentra muitos atendimentos espontâneos. Invista na organização da agenda para ampliar consultas agendadas e de cuidado continuado, visando superar 30% de demanda programada.';
+                                $tipIcon = 'bi-lightbulb text-warning';
+                            } elseif ($s <= 10) {
+                                $tip = 'Atenção: percentual muito baixo de demanda programada. A equipe pode estar focada quase exclusivamente em demanda espontânea (urgência, consulta no dia). Revise o processo de agendamento e amplie as consultas agendadas e de cuidado continuado.';
+                                $tipIcon = 'bi-exclamation-triangle-fill text-danger';
+                            } else {
+                                $tip = 'Atenção: percentual muito elevado de demanda programada (>70%). Verifique se a equipe está aberta à demanda espontânea (escuta inicial, consulta no dia e urgências), pois esse excesso pode restringir o acesso imediato da população.';
+                                $tipIcon = 'bi-exclamation-triangle-fill text-danger';
+                            }
+                            ?>
+                            <button type="button" class="btn btn-sm btn-link p-0 border-0"
+                                    data-bs-toggle="popover"
+                                    data-bs-trigger="click"
+                                    data-bs-placement="left"
+                                    data-bs-content="<?= htmlspecialchars($tip) ?>">
+                                <i class="bi <?= $tipIcon ?> fs-5"></i>
+                            </button>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -285,5 +313,18 @@ if ($token === '') {
 })();
 </script>
 <?php endif; ?>
+
+<script>
+// Popover activation
+document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => new bootstrap.Popover(el, { html: false }));
+// Close popovers when clicking outside
+document.addEventListener('click', function (e) {
+    if (!e.target.closest('[data-bs-toggle="popover"]')) {
+        document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+            bootstrap.Popover.getInstance(el)?.hide();
+        });
+    }
+});
+</script>
 </body>
 </html>

@@ -162,18 +162,23 @@ if ($token === '') {
 
     <?php if (!empty($tableData)): ?>
 
+    <div class="row g-3 align-items-start">
+
     <!-- Chart -->
-    <div class="card border-0 shadow-sm mb-4">
+    <div class="col-12 col-md-4">
+    <div class="card border-0 shadow-sm h-100">
         <div class="card-header bg-white border-bottom fw-semibold">
             <i class="bi bi-pie-chart-fill me-2 text-success"></i>
             Pontuação por Equipe — <?= htmlspecialchars($selectedComp) ?>
         </div>
-        <div class="card-body">
-            <canvas id="scoreChart" height="260"></canvas>
+        <div class="card-body d-flex align-items-center justify-content-center">
+            <canvas id="scoreChart" style="max-height:260px;"></canvas>
         </div>
     </div>
+    </div><!-- /col chart -->
 
     <!-- Table -->
+    <div class="col-12 col-md-8">
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white border-bottom fw-semibold">
             <i class="bi bi-table me-2 text-success"></i>
@@ -247,7 +252,10 @@ if ($token === '') {
             <span class="badge bg-warning text-dark">Suficiente: &gt;10 e ≤30%</span>&nbsp;
             <span class="badge bg-danger">Regular: ≤10 ou &gt;70%</span>
         </div>
-    </div>
+    </div><!-- /table card -->
+    </div><!-- /col table -->
+
+    </div><!-- /row -->
 
     <?php elseif (!empty($imports)): ?>
         <div class="alert alert-info">
@@ -296,6 +304,7 @@ if ($token === '') {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: true,

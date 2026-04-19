@@ -101,57 +101,85 @@ function detectSeparator(string $headerLine): string
     return $semiCount >= $commaCount ? ';' : ',';
 }
 
-$separator = detectSeparator($lines[0]);
-
 // ── 7. Find header row ──
-$headerRow = -1;
-$headerMap = [];
-
+// More-specific aliases MUST appear before less-specific ones that are
+// substrings of them (e.g. 'consulta agendada programada' before 'consulta agendada').
 $colAliases = [
     'equipe'                       => ['equipe', 'nome da equipe', 'nome equipe'],
     'categoria'                    => ['categoria profissional', 'categoria', 'profissional'],
     'atendimento_urgencia'         => ['atendimento de urgência', 'atendimento de urgencia', 'urgência', 'urgencia'],
-    'consulta_agendada'            => ['consulta agendada'],
     'consulta_agendada_programada' => ['consulta agendada programada', 'consulta agendada programada / cuidado continuado', 'cuidado continuado'],
+    'consulta_agendada'            => ['consulta agendada'],
     'consulta_no_dia'              => ['consulta no dia'],
-    'total'                        => ['total'],
+    'total'                        => ['totais', 'total'],
 ];
+
+$headerRow = -1;
+$headerMap = [];
+// Detect separator from the actual header row (the one that contains 'equipe'
+// and 'categoria') rather than from $lines[0] which may be a metadata row.
+$separator = ';'; // fallback
+
+// e-SUS APS exports use a two-row header:
+//   row A  ;;Tipo de Atendimento;Atendimento de Urgência;Consulta Agendada;…
+//   row B  Equipe;Categoria Profissional;;
+// We need to merge both rows to map all fields correctly.
+// $prevLineIdx tracks the last non-empty, non-header line seen before the
+// "Equipe / Categoria Profissional" row (row B above), which is row A.
+$prevLineIdx = -1;
 
 foreach ($lines as $lineIdx => $line) {
     if (trim($line) === '') {
         continue;
     }
-    $cols = str_getcsv($line, $separator);
-    $colsNorm = array_map(fn($c) => mb_strtolower(trim($c)), $cols);
 
-    // Check if this row contains key header words
-    $hasCategoria = false;
-    $hasEquipe    = false;
-    foreach ($colsNorm as $c) {
-        if (str_contains($c, 'categoria')) {
-            $hasCategoria = true;
-        }
-        if (str_contains($c, 'equipe')) {
-            $hasEquipe = true;
+    $lineLower = mb_strtolower($line);
+    if (!str_contains($lineLower, 'equipe') || !str_contains($lineLower, 'categoria')) {
+        $prevLineIdx = $lineIdx;
+        continue;
+    }
+
+    // This line is the "equipe+categoria" header row — use it for separator detection.
+    $separator = detectSeparator($line);
+    $cols      = str_getcsv($line, $separator);
+    $colsNorm  = array_map(fn($c) => mb_strtolower(trim($c)), $cols);
+
+    $headerRow = $lineIdx;
+
+    // If the previous non-empty, non-header row exists, merge its non-empty
+    // cells into $colsNorm at the same column index.  This covers the common
+    // e-SUS APS layout where numeric sub-column labels (row A) live on the row
+    // immediately above the "Equipe / Categoria Profissional" row (row B).
+    if ($prevLineIdx !== -1) {
+        $prevCols     = str_getcsv($lines[$prevLineIdx], $separator);
+        $prevColsNorm = array_map(fn($c) => mb_strtolower(trim($c)), $prevCols);
+        foreach ($prevColsNorm as $idx => $prevCell) {
+            if ($prevCell !== '' && ($colsNorm[$idx] ?? '') === '') {
+                $colsNorm[$idx] = $prevCell;
+            }
         }
     }
-    if ($hasCategoria && $hasEquipe) {
-        $headerRow = $lineIdx;
-        // Map field → column index
-        foreach ($colAliases as $field => $aliases) {
-            foreach ($colsNorm as $idx => $colName) {
-                foreach ($aliases as $alias) {
-                    if (str_contains($colName, $alias)) {
-                        if (!isset($headerMap[$field])) {
-                            $headerMap[$field] = $idx;
-                        }
-                        break 2;
-                    }
+
+    // Map field → column index.
+    // $usedCols prevents two fields from claiming the same column index, which
+    // would happen when a shorter alias (e.g. 'consulta agendada') is a
+    // substring of a longer column name ('consulta agendada programada').
+    $usedCols = [];
+    foreach ($colAliases as $field => $aliases) {
+        foreach ($colsNorm as $idx => $colName) {
+            if (isset($usedCols[$idx])) {
+                continue;
+            }
+            foreach ($aliases as $alias) {
+                if (str_contains($colName, $alias)) {
+                    $headerMap[$field] = $idx;
+                    $usedCols[$idx]    = true;
+                    break 2;
                 }
             }
         }
-        break;
     }
+    break;
 }
 
 if ($headerRow === -1) {
@@ -162,8 +190,8 @@ if ($headerRow === -1) {
     );
 }
 
-// Verify required columns
-$requiredFields = ['equipe', 'categoria', 'total'];
+// Verify required columns (total/totais is optional — computed from row values if absent)
+$requiredFields = ['equipe', 'categoria'];
 foreach ($requiredFields as $f) {
     if (!isset($headerMap[$f])) {
         flashAndRedirect(
@@ -238,7 +266,9 @@ for ($i = $headerRow + 1; $i < count($lines); $i++) {
         'consulta_agendada'            => $getInt('consulta_agendada'),
         'consulta_agendada_programada' => $getInt('consulta_agendada_programada'),
         'consulta_no_dia'              => $getInt('consulta_no_dia'),
-        'total'                        => $getInt('total'),
+        'total'                        => isset($headerMap['total'])
+            ? $getInt('total')
+            : ($getInt('atendimento_urgencia') + $getInt('consulta_agendada') + $getInt('consulta_agendada_programada') + $getInt('consulta_no_dia')),
     ];
 }
 

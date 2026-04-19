@@ -11,6 +11,7 @@ $admin    = null;
 $tableData = [];
 $imports   = [];
 $chartColors = [];
+$pieCounts   = ['otimo' => 0, 'bom' => 0, 'suficiente' => 0, 'regular' => 0];
 
 if ($token === '') {
     http_response_code(400);
@@ -74,12 +75,14 @@ if ($token === '') {
                         'score'     => $score,
                         'score_fmt' => number_format($score, 2, ',', '.'),
                     ];
-                    if ($score >= 75) {
-                        $chartColors[] = 'rgba(25,135,84,0.8)';
-                    } elseif ($score >= 50) {
-                        $chartColors[] = 'rgba(255,193,7,0.8)';
+                    if ($score > 50 && $score <= 70) {
+                        $pieCounts['otimo']++;
+                    } elseif ($score > 30 && $score <= 50) {
+                        $pieCounts['bom']++;
+                    } elseif ($score > 10 && $score <= 30) {
+                        $pieCounts['suficiente']++;
                     } else {
-                        $chartColors[] = 'rgba(220,53,69,0.8)';
+                        $pieCounts['regular']++;
                     }
                 }
                 usort($tableData, fn($a, $b) => $b['score'] <=> $a['score']);
@@ -159,18 +162,23 @@ if ($token === '') {
 
     <?php if (!empty($tableData)): ?>
 
+    <div class="row g-3 align-items-start">
+
     <!-- Chart -->
-    <div class="card border-0 shadow-sm mb-4">
+    <div class="col-12 col-md-4">
+    <div class="card border-0 shadow-sm h-100">
         <div class="card-header bg-white border-bottom fw-semibold">
-            <i class="bi bi-bar-chart-fill me-2 text-success"></i>
+            <i class="bi bi-pie-chart-fill me-2 text-success"></i>
             Pontuação por Equipe — <?= htmlspecialchars($selectedComp) ?>
         </div>
-        <div class="card-body">
-            <canvas id="scoreChart" height="260"></canvas>
+        <div class="card-body d-flex align-items-center justify-content-center">
+            <canvas id="scoreChart" style="max-height:260px;"></canvas>
         </div>
     </div>
+    </div><!-- /col chart -->
 
     <!-- Table -->
+    <div class="col-12 col-md-8">
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white border-bottom fw-semibold">
             <i class="bi bi-table me-2 text-success"></i>
@@ -184,6 +192,7 @@ if ($token === '') {
                         <th class="text-center">DN</th>
                         <th class="text-center">NM</th>
                         <th class="text-center">Pontuação</th>
+                        <th class="text-center">Dica</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -195,13 +204,41 @@ if ($token === '') {
                         <td class="text-center">
                             <?php
                             $s = $row['score'];
-                            if ($s >= 75)      $bc = 'bg-success';
-                            elseif ($s >= 50)  $bc = 'bg-warning text-dark';
-                            else               $bc = 'bg-danger';
+                            if ($s > 50 && $s <= 70)     $bc = 'bg-success';
+                            elseif ($s > 30 && $s <= 50) $bc = 'bg-primary';
+                            elseif ($s > 10 && $s <= 30) $bc = 'bg-warning text-dark';
+                            else                         $bc = 'bg-danger';
                             ?>
                             <span class="badge <?= $bc ?> px-3 py-2" style="font-size:.85rem;">
-                                <?= $row['score_fmt'] ?>%
+                                <?= $row['score_fmt'] ?>
                             </span>
+                        </td>
+                        <td class="text-center">
+                            <?php
+                            if ($s > 50 && $s <= 70) {
+                                $tip = 'Ótimo desempenho! A equipe mantém equilíbrio ideal entre demanda programada (>50% e ≤70%) e espontânea. Continue monitorando mensalmente para sustentar esse resultado.';
+                                $tipIcon = 'bi-check-circle-fill text-success';
+                            } elseif ($s > 30 && $s <= 50) {
+                                $tip = 'Bom desempenho. Para alcançar o Ótimo, amplie gradativamente as consultas agendadas, agendadas programadas e de cuidado continuado até atingir entre 50% e 70% do total de atendimentos.';
+                                $tipIcon = 'bi-lightbulb-fill text-primary';
+                            } elseif ($s > 10 && $s <= 30) {
+                                $tip = 'A equipe ainda concentra muitos atendimentos espontâneos. Invista na organização da agenda para ampliar consultas agendadas e de cuidado continuado, visando superar 30% de demanda programada.';
+                                $tipIcon = 'bi-lightbulb text-warning';
+                            } elseif ($s <= 10) {
+                                $tip = 'Atenção: percentual muito baixo de demanda programada. A equipe pode estar focada quase exclusivamente em demanda espontânea (urgência, consulta no dia). Revise o processo de agendamento e amplie as consultas agendadas e de cuidado continuado.';
+                                $tipIcon = 'bi-exclamation-triangle-fill text-danger';
+                            } else {
+                                $tip = 'Atenção: percentual muito elevado de demanda programada (>70%). Verifique se a equipe está aberta à demanda espontânea (escuta inicial, consulta no dia e urgências), pois esse excesso pode restringir o acesso imediato da população.';
+                                $tipIcon = 'bi-exclamation-triangle-fill text-danger';
+                            }
+                            ?>
+                            <button type="button" class="btn btn-sm btn-link p-0 border-0"
+                                    data-bs-toggle="popover"
+                                    data-bs-trigger="click"
+                                    data-bs-placement="left"
+                                    data-bs-content="<?= htmlspecialchars($tip) ?>">
+                                <i class="bi <?= $tipIcon ?> fs-5"></i>
+                            </button>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -210,11 +247,15 @@ if ($token === '') {
         </div>
         <div class="card-footer bg-white border-top small text-muted">
             Pontuação = (NM ÷ DN) × 100 &nbsp;|&nbsp;
-            <span class="badge bg-success">≥ 75%</span> Meta atingida &nbsp;
-            <span class="badge bg-warning text-dark">≥ 50%</span> Parcial &nbsp;
-            <span class="badge bg-danger">< 50%</span> Abaixo da meta
+            <span class="badge bg-success">Ótimo: &gt;50 e ≤70%</span>&nbsp;
+            <span class="badge bg-primary">Bom: &gt;30 e ≤50%</span>&nbsp;
+            <span class="badge bg-warning text-dark">Suficiente: &gt;10 e ≤30%</span>&nbsp;
+            <span class="badge bg-danger">Regular: ≤10 ou &gt;70%</span>
         </div>
-    </div>
+    </div><!-- /table card -->
+    </div><!-- /col table -->
+
+    </div><!-- /row -->
 
     <?php elseif (!empty($imports)): ?>
         <div class="alert alert-info">
@@ -240,43 +281,59 @@ if ($token === '') {
 <?php if (!empty($tableData)): ?>
 <script>
 (function () {
-    const labels = <?= json_encode(array_column($tableData, 'equipe')) ?>;
-    const scores = <?= json_encode(array_column($tableData, 'score')) ?>;
-    const colors = <?= json_encode($chartColors) ?>;
+    const pieLabels = ['Ótimo', 'Bom', 'Suficiente', 'Regular'];
+    const pieData   = <?= json_encode(array_values($pieCounts)) ?>;
+    const pieColors = [
+        'rgba(25,135,84,0.85)',
+        'rgba(13,110,253,0.85)',
+        'rgba(253,126,20,0.85)',
+        'rgba(220,53,69,0.85)'
+    ];
 
     new Chart(document.getElementById('scoreChart').getContext('2d'), {
-        type: 'bar',
+        type: 'doughnut',
         data: {
-            labels,
+            labels: pieLabels,
             datasets: [{
-                label: 'Pontuação (%)',
-                data: scores,
-                backgroundColor: colors,
-                borderColor: colors.map(c => c.replace('0.8', '1')),
-                borderWidth: 1,
-                borderRadius: 4,
+                data: pieData,
+                backgroundColor: pieColors,
+                borderColor: pieColors.map(c => c.replace('0.85', '1')),
+                borderWidth: 2,
+                hoverOffset: 10
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: { label: ctx => ctx.parsed.y.toFixed(2).replace('.', ',') + '%' }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true, max: 100,
-                    ticks: { callback: v => v + '%' },
-                    grid: { color: 'rgba(0,0,0,.06)' }
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: { padding: 16, font: { size: 13 } }
                 },
-                x: { ticks: { maxRotation: 35, font: { size: 11 } } }
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + ' equipe(s)'
+                    }
+                }
             }
         }
     });
 })();
 </script>
 <?php endif; ?>
+
+<script>
+// Popover activation
+document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => new bootstrap.Popover(el, { html: false }));
+// Close popovers when clicking outside
+document.addEventListener('click', function (e) {
+    if (!e.target.closest('[data-bs-toggle="popover"]')) {
+        document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+            bootstrap.Popover.getInstance(el)?.hide();
+        });
+    }
+});
+</script>
 </body>
 </html>

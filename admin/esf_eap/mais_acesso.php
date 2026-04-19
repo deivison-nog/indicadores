@@ -242,7 +242,7 @@ require_once __DIR__ . '/../layout/sidebar.php';
                 </span>
             </div>
             <div class="card-body">
-                <canvas id="scoreChart" height="280"></canvas>
+                <canvas id="scoreChart" style="max-height:260px;"></canvas>
             </div>
         </div>
 
@@ -382,6 +382,7 @@ require_once __DIR__ . '/../layout/sidebar.php';
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: true,
